@@ -1,22 +1,33 @@
 package br.com.fiap.model.vo;
 
-// Classe VO para a tabela Tb_Usuario
 public class Usuario {
     private Integer idUser;
-    private String usuario;
+    private String nome;
     private String email;
+    private String senha;
+    private boolean notificacoes;
+    private String externalId;
 
     // Construtores
     public Usuario() {
     }
 
-    public Usuario(Integer idUser, String usuario, String email) {
+    public Usuario(Integer idUser, String nome, String email, String senha, boolean notificacoes, String externalId) {
         this.idUser = idUser;
-        this.usuario = usuario;
+        this.nome = nome;
         this.email = email;
+        this.senha = senha;
+        this.notificacoes = notificacoes;
+        this.externalId = externalId;
     }
 
-    // Getters e setters
+    public Usuario(String nome, String email, String senha, boolean notificacoes) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.notificacoes = notificacoes;
+    }
+
     public Integer getIdUser() {
         return idUser;
     }
@@ -25,12 +36,12 @@ public class Usuario {
         this.idUser = idUser;
     }
 
-    public String getUsuario() {
-        return usuario;
+    public String getNome() {
+        return nome;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getEmail() {
@@ -41,13 +52,29 @@ public class Usuario {
         this.email = email;
     }
 
-    // Método toString para facilitar a depuração e visualização dos dados
-    @Override
-    public String toString() {
-        return "UsuarioVO{" +
-                "idUser=" + idUser +
-                ", usuario='" + usuario + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+    public String getSenha() {
+        return senha;
     }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
+    public boolean isNotificacoes() {
+        return notificacoes;
+    }
+
+    public void setNotificacoes(boolean notificacoes) {
+        this.notificacoes = notificacoes;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    //Aqui ta faltando o to string, ainda n fiz pq n sei se vou usar
 }

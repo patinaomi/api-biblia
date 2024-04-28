@@ -12,27 +12,29 @@ public class UsuarioDaoImpl implements UsuarioDao {
     private Connection conn;
     PreparedStatement ps = null;
     @Override
-    public void insert(Usuario usuario) {
-        String sql = "INSERT INTO Tb_Usuario (usuario, email) VALUES (?, ?)";
+    public void inserir(Usuario usuario) {
+        // Adicionando todos os campos necessários conforme a tabela de usuário
+        String sql = "INSERT INTO Tb_Usuario (nome, email, senha, notificacoes, external_id) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexaoBancoDeDados.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, usuario.getIdUser());
-            ps.setString(2, usuario.getUsuario());
-            ps.setString(3, usuario.getEmail());
+            ps.setString(1, usuario.getNome());
+            ps.setString(2, usuario.getEmail());
+            ps.setString(3, usuario.getSenha());
+            ps.setBoolean(4, usuario.isNotificacoes());
+            ps.setString(5, usuario.getExternalId()); // Adiciona o ID externo
 
             int dadosAlterados = ps.executeUpdate();
             if (dadosAlterados > 0) {
-                System.out.println("Novo Usuário Cadastrado!");
+                System.out.println("Novo Usuário cadastrado!");
             } else {
                 System.err.println("Erro: Nenhum Usuário foi criado.");
             }
 
         } catch (SQLException e) {
-            System.err.println("Erro ao salvar questionário");
+            System.err.println("Erro ao salvar novo usuário");
             e.printStackTrace();
         }
-
     }
 }
