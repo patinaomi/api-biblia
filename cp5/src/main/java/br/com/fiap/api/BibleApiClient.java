@@ -54,5 +54,20 @@ public class BibleApiClient {
             return null; // Retorna null em caso de falha
         }
     }
+
+    public String getRandomVerseByAbbreviation(String abbrev) {
+        String url = "https://www.abibliadigital.com.br/api/verses/nvi/" + abbrev + "/random";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.body(); // Retorna o conteúdo do versículo diretamente
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
 

@@ -76,5 +76,4 @@ public class Usuario {
         this.externalId = externalId;
     }
 
-    //Aqui ta faltando o to string, ainda n fiz pq n sei se vou usar
 }

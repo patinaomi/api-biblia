@@ -87,14 +87,8 @@ public class Versiculo {
     // Método toString
     @Override
     public String toString() {
-        return "VersiculoVO{" +
-                "idVers=" + idVers +
-                ", livro='" + livro + '\'' +
-                ", capitulo=" + capitulo +
-                ", numero=" + numero +
-                ", texto='" + texto + '\'' +
-                ", dataRegistro=" + GestaoData.formatarTimestampParaString(getDataRegistro()) +
-                ", idUsuario=" + idUsuario +
-                '}';
+        return  getTexto() +
+                "\n" + getLivro() +
+                "  " + getCapitulo() + ":" + getNumero();
     }
 }

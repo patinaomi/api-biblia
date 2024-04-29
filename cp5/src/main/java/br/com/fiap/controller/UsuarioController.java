@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class UsuarioController {
     private UsuarioDao usuarioDao;
 
-   public UsuarioController(UsuarioDao usuarioDao) throws SQLException {
+   public UsuarioController(UsuarioDao usuarioDao) {
         this.usuarioDao = usuarioDao;
     }
 

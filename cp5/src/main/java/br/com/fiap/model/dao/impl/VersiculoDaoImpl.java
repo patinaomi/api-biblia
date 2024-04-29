@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VersiculoDaoImpl implements VersiculoDao {
-    private Connection conn;
-    PreparedStatement ps = null;
 
     @Override
     public void inserir(Versiculo versiculo) {
@@ -66,6 +64,7 @@ public class VersiculoDaoImpl implements VersiculoDao {
                 versiculo.setDataRegistro(rs.getTimestamp("data_registro"));
                 versiculos.add(versiculo);
             }
+
         } catch (SQLException e) {
             System.err.println("Erro ao listar versículos");
             e.printStackTrace();

@@ -9,11 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class UsuarioDaoImpl implements UsuarioDao {
-    private Connection conn;
-    PreparedStatement ps = null;
     @Override
     public void inserir(Usuario usuario) {
-        // Adicionando todos os campos necessários conforme a tabela de usuário
         String sql = "INSERT INTO Tb_Usuario (nome, email, senha, notificacoes, external_id) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexaoBancoDeDados.getConnection();
