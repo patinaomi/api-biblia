@@ -11,18 +11,23 @@ import br.com.fiap.model.dao.impl.VersiculoDaoImpl;
 import br.com.fiap.service.BibleService;
 import br.com.fiap.service.OpenAiService;
 import br.com.fiap.service.VerseBotService;
+import org.glassfish.jersey.server.ResourceConfig;
 
-
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+
 
 public class Main {
     public static void main(String[] args) throws SQLException {
 
+        //Bot do Telegram
         OpenAiService openAiService = new OpenAiService(); // Inicializa OpenAiService
         VerseBotService botService = new VerseBotService("7139256025:AAG-ytt-WXW-wxWKiUzw1PGjJu3sA8DajVw", openAiService); // Passa para o construtor
-
         botService.setListener(); // Configura o listener
+
+
 
         // Criando o cliente da API
         BibleApiClient apiClient = new BibleApiClient();
@@ -31,7 +36,7 @@ public class Main {
         VersiculoController versiculoController = new VersiculoController(versiculoDao);
 
         //versiculoController.listarVersiculosPorUser("testetoken");
-        
+
 
         //openAiService.dispararRequisicao(user);
 
