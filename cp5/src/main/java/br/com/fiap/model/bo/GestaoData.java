@@ -15,7 +15,7 @@ public class GestaoData {
     }
 
 
-    // Para formatar Timestamp para String
+    // Para formatar Timestamp para String (para apresentar no tostring)
     public static String formatarTimestampParaString(Timestamp dataHora) {
         LocalDateTime dataHoraLocal = dataHora.toLocalDateTime();
         return dataFormatada.format(dataHoraLocal);

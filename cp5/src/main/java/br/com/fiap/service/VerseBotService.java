@@ -1,10 +1,12 @@
 package br.com.fiap.service;
 
 import br.com.fiap.api.BibleApiClient;
+import br.com.fiap.model.bo.UsuarioBO;
 import br.com.fiap.model.dao.UsuarioDao;
 import br.com.fiap.model.dao.VersiculoDao;
 import br.com.fiap.model.dao.impl.UsuarioDaoImpl;
 import br.com.fiap.model.dao.impl.VersiculoDaoImpl;
+import br.com.fiap.model.vo.Usuario;
 import br.com.fiap.model.vo.Versiculo;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -14,14 +16,21 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class VerseBotService {
 
     BibleApiClient apiClient = new BibleApiClient();
     VersiculoDao versiculoDao = new VersiculoDaoImpl();
     UsuarioDao usuarioDao = new UsuarioDaoImpl();
     BibleService bibleService = new BibleService(apiClient, usuarioDao, versiculoDao);
+    UsuarioBO usuarioBO = new UsuarioBO();
     private OpenAiService openAiService;
     private TelegramBot bot;
+
+    private Map<String, String> userStates = new HashMap<>(); // Armazena o estado da conversa de cada usuário
+    private Map<String, Usuario> tempUsers = new HashMap<>(); // Armazena temporariamente informações de cada usuário
 
     public VerseBotService(String token, OpenAiService openAiService) {
         bot = new TelegramBot(token);
@@ -50,38 +59,45 @@ public class VerseBotService {
             Chat chat = message.chat();
             String chatId = String.valueOf(chat.id());
 
-            String userText = message.text(); // Texto enviado pelo usuário
+            String userText = message.text();
+
+            String currentState = userStates.get(chatId); // Obtém o estado atual
 
             if (userText.equalsIgnoreCase("/start")) {
                 String welcomeMessage = "Bem-vindo ao VerseBot! Use /versiculo para um versículo aleatório ou /devocional para um devocional baseado em um versículo aleatório.";
                 bot.execute(new SendMessage(chatId, welcomeMessage));
+                userStates.put(chatId, null); // Redefine o estado
 
-            } else if (userText.equalsIgnoreCase("/versiculo")) {
-                // Responde com um versículo aleatório
-                Versiculo verse = getRandomVerse(3); // Usa o ID de usuário ou outro identificador conforme necessário
-                SendResponse response = bot.execute(new SendMessage(chatId, verse.toString()));
-                if (!response.isOk()) {
-                    System.err.println("Erro ao enviar mensagem: " + response.description());
+            } else if (userText.equalsIgnoreCase("/cadastro") || "awaiting_name".equals(currentState)) {
+                if ("awaiting_name".equals(currentState)) {
+                    tempUsers.get(chatId).setNome(userText);
+                    userStates.put(chatId, "awaiting_email");
+                    bot.execute(new SendMessage(chatId, "Digite seu e-mail:"));
+                } else {
+                    userStates.put(chatId, "awaiting_name");
+                    tempUsers.put(chatId, new Usuario());
+                    bot.execute(new SendMessage(chatId, "Digite seu nome:"));
                 }
+            } else if ("awaiting_email".equals(currentState)) {
+                tempUsers.get(chatId).setEmail(userText);
+                userStates.put(chatId, "awaiting_password");
+                bot.execute(new SendMessage(chatId, "Digite sua senha:"));
+            } else if ("awaiting_password".equals(currentState)) {
+                Usuario newUser = tempUsers.get(chatId);
+                newUser.setSenha(userText);
+                usuarioBO.inserir(newUser);
 
+                userStates.put(chatId, null); // Reseta o estado da conversa
+                bot.execute(new SendMessage(chatId, "Usuário cadastrado com sucesso!"));
+            } else if (userText.equalsIgnoreCase("/versiculo")) {
+                Versiculo verse = getRandomVerse(3);
+                bot.execute(new SendMessage(chatId, verse.toString()));
             } else if (userText.equalsIgnoreCase("/devocional")) {
-                // Gera um devocional baseado em um versículo aleatório
                 Versiculo verse = getRandomVerse(3);
                 String devotional = openAiService.gerarDevocional(verse.toString());
-
-                // Constrói a resposta incluindo o versículo e o devocional
-                String responseText = verse.toString() + "\n\n" + (devotional != null ? devotional : "");
-
-                SendResponse response = bot.execute(new SendMessage(chatId, responseText));
-                if (!response.isOk()) {
-                    System.err.println("Erro ao enviar mensagem: " + response.description());
-                }
+                bot.execute(new SendMessage(chatId, verse.toString() + "\n\n" + devotional));
             } else {
-                // Mensagem não reconhecida
-                SendResponse response = bot.execute(new SendMessage(chatId, "Por favor, use /versiculo para um versículo aleatório ou /devocional para um devocional baseado em um versículo."));
-                if (!response.isOk()) {
-                    System.err.println("Erro ao enviar mensagem: " + response.description());
-                }
+                bot.execute(new SendMessage(chatId, "Por favor, use /versiculo para um versículo aleatório ou /devocional para um devocional baseado em um versículo."));
             }
         }
     }

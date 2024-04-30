@@ -13,13 +13,16 @@ public class VersiculoController {
         this.versiculoDao = versiculoDao;
     }
 
+    //Salva o versiculo no banco de dados
     public void inserir (Versiculo versiculo) throws SQLException {
         versiculoDao.inserir(versiculo);
     }
+
+    //Mostra os versiculos cadastrados por usuário
     public void listarVersiculosPorUser(String usuario) throws SQLException {
         List<Versiculo> versiculos = versiculoDao.listarVersiculosPorUser(usuario);
         for (Versiculo v : versiculos) {
-            System.out.println(v); // Ou qualquer outra forma de exibição adequada
+            System.out.println(v);
         }
     }
 }

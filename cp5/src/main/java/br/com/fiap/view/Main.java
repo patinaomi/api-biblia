@@ -11,12 +11,9 @@ import br.com.fiap.model.dao.impl.VersiculoDaoImpl;
 import br.com.fiap.service.BibleService;
 import br.com.fiap.service.OpenAiService;
 import br.com.fiap.service.VerseBotService;
-import org.glassfish.jersey.server.ResourceConfig;
 
-import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 
 
 public class Main {
@@ -24,33 +21,24 @@ public class Main {
 
         //Bot do Telegram
         OpenAiService openAiService = new OpenAiService(); // Inicializa OpenAiService
-        VerseBotService botService = new VerseBotService("7139256025:AAG-ytt-WXW-wxWKiUzw1PGjJu3sA8DajVw", openAiService); // Passa para o construtor
+        VerseBotService botService = new VerseBotService("7139256025:AAG-ytt-WXW-wxWKiUzw1PGjJu3sA8DajVw", openAiService);
         botService.setListener(); // Configura o listener
 
 
+        // Configurando a conexão com o banco de dados
+        Connection conn = ConexaoBancoDeDados.getConnection();
 
-        // Criando o cliente da API
-        BibleApiClient apiClient = new BibleApiClient();
-        VersiculoDao versiculoDao = new VersiculoDaoImpl();
 
-        VersiculoController versiculoController = new VersiculoController(versiculoDao);
 
         //versiculoController.listarVersiculosPorUser("testetoken");
 
 
-        //openAiService.dispararRequisicao(user);
-
-        // Configurando a conexão com o banco de dados
-        Connection conn = ConexaoBancoDeDados.getConnection();
 
         // Criando a implementação do DAO
         UsuarioDao usuarioDao = new UsuarioDaoImpl();
 
         // Criando o serviço com as dependências
-        BibleService bibleService = new BibleService(apiClient, usuarioDao, versiculoDao);
 
-        // Criando um novo usuário
-        //Usuario novoUsuario = new Usuario("testetoken", "testetoken@gmail.com", "senha123", true);
 
         // Registrando o usuário via serviço
         //bibleService.registrar(novoUsuario);

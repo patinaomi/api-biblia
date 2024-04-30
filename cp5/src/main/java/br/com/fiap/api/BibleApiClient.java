@@ -33,7 +33,7 @@ public class BibleApiClient {
 
         try {
             HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body(); // Return response body for further processing
+            return response.body();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -48,10 +48,10 @@ public class BibleApiClient {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body(); // Retorna a resposta da API
+            return response.body();
         } catch (Exception e) {
             e.printStackTrace();
-            return null; // Retorna null em caso de falha
+            return null;
         }
     }
 
@@ -63,7 +63,7 @@ public class BibleApiClient {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body(); // Retorna o conteúdo do versículo diretamente
+            return response.body();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

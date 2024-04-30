@@ -1,7 +1,5 @@
 package br.com.fiap.model.vo;
 
-import br.com.fiap.model.bo.GestaoData;
-
 import java.sql.Timestamp;
 
 public class Versiculo {
