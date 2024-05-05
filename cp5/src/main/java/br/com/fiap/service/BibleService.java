@@ -92,7 +92,7 @@ public class BibleService {
 
             return versiculo;
         } else {
-            return null; // Em caso de falha
+            return null;
         }
     }
 }
