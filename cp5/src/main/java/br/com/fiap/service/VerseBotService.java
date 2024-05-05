@@ -25,9 +25,9 @@ public class VerseBotService {
     BibleService bibleService = new BibleService(apiClient, usuarioDao, versiculoDao);
     UsuarioBO usuarioBO = new UsuarioBO(usuarioDao, bibleService);
     private TelegramBot bot;
-    private Map<String, String> userStates = new HashMap<>();
-    private Map<String, Usuario> tempUsers = new HashMap<>();
     private OpenAiService openAiService;
+    private Map<String, String> userStates = new HashMap<>();
+    private Map<String, Versiculo> lastGeneratedVerses = new HashMap<>();
 
     public VerseBotService(String token, OpenAiService openAiService) {
         bot = new TelegramBot(token);
@@ -59,7 +59,6 @@ public class VerseBotService {
         if (message != null && message.text() != null && !message.text().isEmpty()) {
             String chatId = String.valueOf(message.chat().id());
             String userText = message.text().trim();
-            String currentState = userStates.getOrDefault(chatId, "");
 
             switch (userText.toLowerCase()) {
                 case "/start":
@@ -71,12 +70,12 @@ public class VerseBotService {
                 case "/versiculo":
                     handleVersiculo(chatId);
                     break;
-                case "/cadastro":
-                    startCadastro(chatId);
+                case "/salvar":
+                    requestUserName(chatId);
                     break;
                 default:
-                    if (!currentState.isEmpty()) {
-                        handleCadastro(chatId, userText, currentState);
+                    if ("awaiting_name".equals(userStates.get(chatId))) {
+                        handleSaveVerse(chatId, userText);
                     } else {
                         handleDefault(chatId);
                     }
@@ -86,57 +85,52 @@ public class VerseBotService {
     }
 
     private void handleStart(String chatId) {
-        String welcomeMessage = "Bem-vindo ao VerseBot! Selecione alguma opção do menu no canto inferior esquerdo.";
+        String welcomeMessage = "Bem-vindo ao VerseBot! Utilize o menu inferior a esquerda para acessar as opções.";
         bot.execute(new SendMessage(chatId, welcomeMessage));
         userStates.put(chatId, null);
     }
 
     private void handleDevocional(String chatId) throws SQLException {
-        Versiculo versiculoDevocional = getRandomVerse(3);
+        Versiculo versiculoDevocional = getRandomVerse(0); // Assuming 0 is a default or non-user specific ID
         String devotional = openAiService.gerarDevocional(versiculoDevocional.toString());
+        lastGeneratedVerses.put(chatId, versiculoDevocional);
         bot.execute(new SendMessage(chatId, versiculoDevocional.toString() + "\n\n" + devotional));
     }
 
     private void handleVersiculo(String chatId) throws SQLException {
-        Versiculo versiculo = getRandomVerse(3);
+        Versiculo versiculo = getRandomVerse(0); // Assuming 0 is a default or non-user specific ID
+        lastGeneratedVerses.put(chatId, versiculo);
         bot.execute(new SendMessage(chatId, versiculo.toString()));
     }
 
-    private void startCadastro(String chatId) {
-        userStates.put(chatId, "awaiting_name");
-        bot.execute(new SendMessage(chatId, "Digite seu nome:"));
+    private void requestUserId(String chatId) {
+        userStates.put(chatId, "awaiting_id");
+        bot.execute(new SendMessage(chatId, "Por favor, digite seu ID para salvar o versículo:"));
     }
 
-    private void handleCadastro(String chatId, String userText, String currentState) throws SQLException {
-        switch (currentState) {
-            case "awaiting_name":
-                if (Validacoes.validarNome(userText)) {
-                    tempUsers.put(chatId, new Usuario());
-                    tempUsers.get(chatId).setNome(userText);
-                    userStates.put(chatId, "awaiting_email");
-                    bot.execute(new SendMessage(chatId, "Nome válido! Digite seu e-mail:"));
-                } else {
-                    bot.execute(new SendMessage(chatId, "Nome inválido, tente novamente."));
-                }
-                break;
-            case "awaiting_email":
-                if (Validacoes.validarEmail(userText)) {
-                    tempUsers.get(chatId).setEmail(userText);
-                    userStates.put(chatId, "awaiting_password");
-                    bot.execute(new SendMessage(chatId, "E-mail válido! Digite sua senha:"));
-                } else {
-                    bot.execute(new SendMessage(chatId, "E-mail inválido, tente novamente."));
-                }
-                break;
-            case "awaiting_password":
-                tempUsers.get(chatId).setSenha(userText);
-                usuarioBO.registrarUsuario(tempUsers.get(chatId));
-                tempUsers.remove(chatId);
-                userStates.remove(chatId);
-                bot.execute(new SendMessage(chatId, "Usuário cadastrado com sucesso!"));
-                break;
+    private void handleSaveVerse(String chatId, String userName) {
+        int userId = usuarioDao.getUserIdByName(userName);
+        if (userId != -1) {
+            Versiculo versiculoToSave = lastGeneratedVerses.get(chatId);
+            if (versiculoToSave != null) {
+                versiculoToSave.setIdUsuario(userId); // Atualiza o ID do usuário no versículo
+                versiculoDao.inserir(versiculoToSave);
+                bot.execute(new SendMessage(chatId, "Versículo salvo com sucesso."));
+            } else {
+                bot.execute(new SendMessage(chatId, "Nenhum versículo foi gerado anteriormente."));
+            }
+        } else {
+            bot.execute(new SendMessage(chatId, "Nome de usuário não encontrado, tente novamente."));
         }
+        userStates.remove(chatId); // Remover o estado independentemente do resultado
     }
+
+
+    private void requestUserName(String chatId) {
+        userStates.put(chatId, "awaiting_name");
+        bot.execute(new SendMessage(chatId, "Por favor, digite seu nome para salvar o versículo:"));
+    }
+
 
     private void handleDefault(String chatId) {
         bot.execute(new SendMessage(chatId, "Opção inválida, por favor selecione uma opção localizada no menu a esquerda."));
@@ -145,4 +139,6 @@ public class VerseBotService {
     private Versiculo getRandomVerse(int userId) {
         return bibleService.getVersiculoAleatorio(userId);
     }
+
+
 }

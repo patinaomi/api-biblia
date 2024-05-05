@@ -15,10 +15,14 @@ public class VersiculoDaoImpl implements VersiculoDao {
 
     @Override
     public void inserir(Versiculo versiculo) {
-        String sql = "INSERT INTO Tb_Versiculo (livro, capitulo, numero, texto, data_registro, id_usuario) VALUES (?, ?, ?, ?, ?, ?)";
+        if (!validarUsuario(versiculo.getIdUsuario())) {
+            System.err.println("Erro: Usuário não encontrado.");
+            return;
+        }
 
-        try(Connection conn = ConexaoBancoDeDados.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "INSERT INTO Tb_Versiculo (livro, capitulo, numero, texto, data_registro, id_usuario) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = ConexaoBancoDeDados.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, versiculo.getLivro());
             ps.setInt(2, versiculo.getCapitulo());
@@ -33,12 +37,25 @@ public class VersiculoDaoImpl implements VersiculoDao {
             } else {
                 System.err.println("Erro: Nenhum Versículo foi registrado.");
             }
-
         } catch (SQLException e) {
             System.err.println("Erro ao salvar novo versículo");
             e.printStackTrace();
         }
     }
+
+    public boolean validarUsuario(int userId) {
+        String sql = "SELECT 1 FROM Tb_Usuario WHERE id_user = ?";
+        try (Connection conn = ConexaoBancoDeDados.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeQuery().next();
+        } catch (SQLException e) {
+            System.err.println("Erro ao verificar usuário.");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     @Override
     public List<Versiculo> listarVersiculosPorUser(String usuario) {
         List<Versiculo> versiculos = new ArrayList<>();

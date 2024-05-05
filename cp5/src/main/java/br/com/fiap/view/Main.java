@@ -34,12 +34,6 @@ public class Main {
 
 
 
-        // Registrando o usuário via serviço
-        //bibleService.registrar(novoUsuario);
-
-        // Chamada ao método para obter um versículo aleatório
-        //Versiculo versiculo = bibleService.getVersiculoAleatorio(3);
-
        //Versiculo versiculo = bibleService.getVersiculoAleatorioDeLivro(3, "gn");
        // if (versiculo != null) {
        //     System.out.println("Versículo: " + versiculo.getTexto());
@@ -47,10 +41,6 @@ public class Main {
         //    System.out.println("Falha ao obter o versículo.");
        // }
 
-        //bibleService.salvarVersiculo(versiculo);
-
-
-        // Verificar e imprimir o resultado
 
     }
 
