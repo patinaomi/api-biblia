@@ -17,6 +17,7 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,14 +25,14 @@ public class VerseBotService {
 
     BibleApiClient apiClient = new BibleApiClient();
     VersiculoDao versiculoDao = new VersiculoDaoImpl();
-    UsuarioDao usuarioDao = new UsuarioDaoImpl();
+    UsuarioDao usuarioDao = new UsuarioDaoImpl(); // Garantindo que usuarioDao seja inicializado
     BibleService bibleService = new BibleService(apiClient, usuarioDao, versiculoDao);
-    UsuarioBO usuarioBO = new UsuarioBO();
-    private OpenAiService openAiService;
+    UsuarioBO usuarioBO = new UsuarioBO(usuarioDao, bibleService); // Passando usuarioDao e bibleService para UsuarioBO
     private TelegramBot bot;
 
     private Map<String, String> userStates = new HashMap<>(); // Armazena o estado da conversa de cada usuário
     private Map<String, Usuario> tempUsers = new HashMap<>(); // Pra armazenar temporariamente as informações de cada usuário
+    private OpenAiService openAiService;
 
     public VerseBotService(String token, OpenAiService openAiService) {
         bot = new TelegramBot(token);
@@ -41,7 +42,11 @@ public class VerseBotService {
     public void setListener() {
         bot.setUpdatesListener(updates -> {
             for (Update update : updates) {
-                processUpdate(update);
+                try {
+                    processUpdate(update);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         }, e -> {
@@ -54,7 +59,7 @@ public class VerseBotService {
         });
     }
 
-    private void processUpdate(Update update) {
+    private void processUpdate(Update update) throws SQLException {
         Message message = update.message();
         if (message != null && message.text() != null && !message.text().isEmpty()) {
             String chatId = String.valueOf(message.chat().id());
@@ -67,6 +72,17 @@ public class VerseBotService {
                     bot.execute(new SendMessage(chatId, welcomeMessage));
                     userStates.put(chatId, null);
                     break;
+                case "/devocional":
+                    Versiculo versiculoDevocional = getRandomVerse(3);
+                    String devotional = openAiService.gerarDevocional(versiculoDevocional.toString());
+                    bot.execute(new SendMessage(chatId, versiculoDevocional.toString() + "\n\n" + devotional));
+                    break;
+
+                case "/versiculo":
+                    Versiculo versiculo = getRandomVerse(3);
+                    bot.execute(new SendMessage(chatId, versiculo.toString()));
+                    break;
+
                 case "/cadastro":
                     userStates.put(chatId, "awaiting_name");
                     bot.execute(new SendMessage(chatId, "Digite seu nome:"));
@@ -91,14 +107,17 @@ public class VerseBotService {
                         }
                     } else if ("awaiting_password".equals(currentState)) {
                         tempUsers.get(chatId).setSenha(userText);
-                        usuarioBO.inserir(tempUsers.get(chatId));
+                        usuarioBO.registrarUsuario(tempUsers.get(chatId));
                         tempUsers.remove(chatId);
                         userStates.remove(chatId);
                         bot.execute(new SendMessage(chatId, "Usuário cadastrado com sucesso!"));
                     } else {
-                        bot.execute(new SendMessage(chatId, "Por favor, use /versiculo para um versículo aleatório ou /devocional para um devocional baseado em um versículo."));
+                        bot.execute(new SendMessage(chatId, "Opção inválida, por favor selecione uma opção localizada no menu a esquerda."));
                     }
                     break;
+
+
+
             }
         }
     }
