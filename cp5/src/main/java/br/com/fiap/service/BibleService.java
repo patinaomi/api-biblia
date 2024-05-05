@@ -24,22 +24,28 @@ public class BibleService {
         this.versiculoDao = versiculoDao;
     }
 
-    public void registrar(Usuario usuario) throws SQLException {
+    // Método para registrar usuário na API externa e retornar o token
+    public String registrar(Usuario usuario) throws SQLException {
         String response = apiClient.createUser(usuario);
         if (response != null && !response.isEmpty()) {
-            // Usando Gson para parsear a resposta JSON
             JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
             String token = jsonResponse.has("token") ? jsonResponse.get("token").getAsString() : "";
             if (!token.isEmpty()) {
-                usuario.setExternalId(token);  // Atualizando o objeto usuario com o token
-                usuarioDao.inserir(usuario);
-                System.out.println("Usuário criado na API e salvo no banco de dados com o token.");
+                usuario.setExternalId(token);
+                return token;
             } else {
                 System.out.println("Usuário criado na API porém o token não foi encontrado.");
+                return null;
             }
         } else {
             System.out.println("Não foi possível criar o usuário na API.");
+            return null;
         }
+    }
+
+    public void inserirUsuarioNoBanco(Usuario usuario) throws SQLException {
+        usuarioDao.inserir(usuario);
+        System.out.println("Usuário salvo no banco de dados com o token.");
     }
 
     public Versiculo getVersiculoAleatorio(int userId) {

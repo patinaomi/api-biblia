@@ -23,18 +23,19 @@ public class UsuarioBO {
         this.usuarioDao = new UsuarioDaoImpl();
     }
 
-    public UsuarioBO(UsuarioDao usuarioDao) {
-        this.usuarioDao = usuarioDao;
+    public UsuarioBO(UsuarioDao usuarioDao, BibleService bibleService) {
+        this.usuarioDao = new UsuarioDaoImpl();
+        this.bibleService = bibleService;
     }
 
-    public void inserir(Usuario usuario) throws SQLException {
-        // Aqui você pode decidir registrar primeiro na API externa
+    public void registrarUsuario(Usuario usuario) throws SQLException {
+        // Validações e lógica de negócios aqui
         String token = bibleService.registrar(usuario);
         if (token != null) {
             usuario.setExternalId(token);
-            usuarioDao.inserir(usuario);  // Persistindo no banco de dados local
+            bibleService.inserirUsuarioNoBanco(usuario);
         } else {
-            throw new IllegalStateException("Falha ao registrar usuário na API.");
+            throw new IllegalStateException("Falha ao registrar usuário na API e no banco de dados.");
         }
     }
 

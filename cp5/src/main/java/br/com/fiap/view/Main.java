@@ -19,7 +19,7 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) throws SQLException {
 
-        //Bot do Telegram
+        //Para funcionar o bot do Telegram
         OpenAiService openAiService = new OpenAiService(); // Inicializa OpenAiService
         VerseBotService botService = new VerseBotService("7139256025:AAG-ytt-WXW-wxWKiUzw1PGjJu3sA8DajVw", openAiService);
         botService.setListener(); // Configura o listener
@@ -32,12 +32,6 @@ public class Main {
 
         //versiculoController.listarVersiculosPorUser("testetoken");
 
-
-
-        // Criando a implementação do DAO
-        UsuarioDao usuarioDao = new UsuarioDaoImpl();
-
-        // Criando o serviço com as dependências
 
 
         // Registrando o usuário via serviço
