@@ -8,6 +8,8 @@ import br.com.fiap.model.dao.impl.VersiculoDaoImpl;
 import br.com.fiap.model.vo.Usuario;
 import br.com.fiap.service.BibleService;
 
+import java.sql.SQLException;
+
 public class UsuarioBO {
     private UsuarioDao usuarioDao;
 
@@ -25,14 +27,15 @@ public class UsuarioBO {
         this.usuarioDao = usuarioDao;
     }
 
-    public void inserir(Usuario usuario) {
-        // Aqui você pode adicionar lógica de negócios, se necessário, antes de inserir o usuário
-        // Por exemplo, validar dados do usuário
-        if (usuario.getNome() == null || usuario.getNome().isEmpty()) {
-            throw new IllegalArgumentException("Nome do usuário não pode ser vazio.");
+    public void inserir(Usuario usuario) throws SQLException {
+        // Aqui você pode decidir registrar primeiro na API externa
+        String token = bibleService.registrar(usuario);
+        if (token != null) {
+            usuario.setExternalId(token);
+            usuarioDao.inserir(usuario);  // Persistindo no banco de dados local
+        } else {
+            throw new IllegalStateException("Falha ao registrar usuário na API.");
         }
-        usuarioDao.inserir(usuario);
-        //bibleService.registrar(usuario);
     }
 
 }
