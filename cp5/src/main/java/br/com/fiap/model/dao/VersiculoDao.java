@@ -4,9 +4,7 @@ import br.com.fiap.model.vo.Versiculo;
 import java.util.List;
 
 public interface VersiculoDao {
-    void inserir(Versiculo versiculo);
-
-    boolean validarUsuario(int userId);
+    void insert(Versiculo versiculo);
     List<Versiculo> listarVersiculosPorUser(String usuario);
 }
 

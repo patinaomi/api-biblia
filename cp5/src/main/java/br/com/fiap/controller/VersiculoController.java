@@ -15,7 +15,7 @@ public class VersiculoController {
 
     //Salva o versiculo no banco de dados
     public void inserir (Versiculo versiculo) throws SQLException {
-        versiculoDao.inserir(versiculo);
+        versiculoDao.insert(versiculo);
     }
 
     //Mostra os versiculos cadastrados por usuário

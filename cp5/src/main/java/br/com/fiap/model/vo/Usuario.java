@@ -1,6 +1,7 @@
 package br.com.fiap.model.vo;
 
 public class Usuario {
+    //Atributos
     private Integer idUser;
     private String nome;
     private String email;
@@ -28,6 +29,7 @@ public class Usuario {
         this.notificacoes = notificacoes;
     }
 
+    //Getters & Setters
     public Integer getIdUser() {
         return idUser;
     }

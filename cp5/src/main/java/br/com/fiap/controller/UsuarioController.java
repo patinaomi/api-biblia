@@ -13,7 +13,7 @@ public class UsuarioController {
     }
 
     public void inserir(Usuario usuario) throws SQLException {
-       usuarioDao.inserir(usuario);
+       usuarioDao.insert(usuario);
     }
 }
 

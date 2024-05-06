@@ -18,7 +18,6 @@ public class UsuarioBO {
     VersiculoDao versiculoDao = new VersiculoDaoImpl();
     BibleService bibleService = new BibleService(apiClient, usuarioDao, versiculoDao);
 
-
     public UsuarioBO() {
         this.usuarioDao = new UsuarioDaoImpl();
     }
@@ -29,10 +28,9 @@ public class UsuarioBO {
     }
 
     public void registrarUsuario(Usuario usuario) throws SQLException {
-        // Validações e lógica de negócios aqui
         String token = bibleService.registrar(usuario);
         if (token != null) {
-            usuario.setExternalId(token);
+            usuario.setExternalId(token); //Esse token é da API da bíblia
             bibleService.inserirUsuarioNoBanco(usuario);
         } else {
             throw new IllegalStateException("Falha ao registrar usuário na API e no banco de dados.");

@@ -3,6 +3,7 @@ package br.com.fiap.model.vo;
 import java.sql.Timestamp;
 
 public class Versiculo {
+    //Atributos
     private Integer idVers;
     private String livro;
     private Integer capitulo;

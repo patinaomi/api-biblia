@@ -14,7 +14,7 @@ import java.util.List;
 public class VersiculoDaoImpl implements VersiculoDao {
 
     @Override
-    public void inserir(Versiculo versiculo) {
+    public void insert(Versiculo versiculo) {
         String sql = "INSERT INTO Tb_Versiculo (livro, capitulo, numero, texto, data_registro, id_usuario) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexaoBancoDeDados.getConnection();
@@ -25,7 +25,7 @@ public class VersiculoDaoImpl implements VersiculoDao {
             ps.setInt(3, versiculo.getNumero());
             ps.setString(4, versiculo.getTexto());
             ps.setTimestamp(5, versiculo.getDataRegistro());
-            ps.setInt(6, versiculo.getIdUsuario()); // Garantir que este é o ID correto
+            ps.setInt(6, versiculo.getIdUsuario()); // Garantir que este é o ID correto (é o FK)
 
             int dadosAlterados = ps.executeUpdate();
             if (dadosAlterados > 0) {
@@ -38,25 +38,6 @@ public class VersiculoDaoImpl implements VersiculoDao {
             e.printStackTrace();
         }
     }
-
-
-    public boolean validarUsuario(int userId) {
-        String sql = "SELECT COUNT(1) FROM Tb_Usuario WHERE id_user = ?";
-        try (Connection conn = ConexaoBancoDeDados.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0; // Retorna true se o usuário existe
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao verificar existência do usuário.");
-            e.printStackTrace();
-        }
-        return false; // Retorna false se o usuário não existir ou ocorrer um erro
-    }
-
 
     @Override
     public List<Versiculo> listarVersiculosPorUser(String usuario) {

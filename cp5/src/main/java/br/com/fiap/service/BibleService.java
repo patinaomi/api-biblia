@@ -44,7 +44,7 @@ public class BibleService {
     }
 
     public void inserirUsuarioNoBanco(Usuario usuario) throws SQLException {
-        usuarioDao.inserir(usuario);
+        usuarioDao.insert(usuario);
         System.out.println("Usuário salvo no banco de dados com o token.");
     }
 
@@ -73,6 +73,7 @@ public class BibleService {
         }
     }
 
+    //Esse método gera um versículo aleatório com base em um livro da Bíblia, acabei não implementando
     public Versiculo getVersiculoAleatorioDeLivro(int userId, String abbrev) {
         Gson gson = new Gson();
         String jsonResponse = apiClient.getRandomVerseByAbbreviation(abbrev);

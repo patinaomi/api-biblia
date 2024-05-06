@@ -13,12 +13,5 @@ public class Main {
         OpenAiService openAiService = new OpenAiService(); // Inicializa OpenAiService
         VerseBotService botService = new VerseBotService("7139256025:AAG-ytt-WXW-wxWKiUzw1PGjJu3sA8DajVw", openAiService);
         botService.setListener(); // Configura o listener
-
-
-        // Configurando a conexão com o banco de dados
-        Connection conn = ConexaoBancoDeDados.getConnection();
     }
-
-
-
-    }
+}

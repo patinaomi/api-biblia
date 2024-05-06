@@ -9,19 +9,14 @@ import br.com.fiap.model.dao.impl.UsuarioDaoImpl;
 import br.com.fiap.model.dao.impl.VersiculoDaoImpl;
 import br.com.fiap.model.vo.Usuario;
 import br.com.fiap.model.vo.Versiculo;
-import com.ibm.watson.text_to_speech.v1.TextToSpeech;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.InputFile;
 import com.pengrad.telegrambot.request.SendAudio;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +112,7 @@ public class VerseBotService {
             Versiculo versiculoToSave = lastGeneratedVerses.get(chatId);
             if (versiculoToSave != null) {
                 versiculoToSave.setIdUsuario(userId); // Atualiza o ID do usuário no versículo
-                versiculoDao.inserir(versiculoToSave);
+                versiculoDao.insert(versiculoToSave);
                 bot.execute(new SendMessage(chatId, "Versículo salvo com sucesso."));
             } else {
                 bot.execute(new SendMessage(chatId, "Nenhum versículo foi gerado anteriormente."));
@@ -228,9 +223,9 @@ public class VerseBotService {
     private void handleListingVerses(String chatId, String userName) throws SQLException {
         List<Versiculo> versiculos = versiculoDao.listarVersiculosPorUser(userName);
         if (!versiculos.isEmpty()) {
-            StringBuilder response = new StringBuilder("Seus versículos:\n");
+            StringBuilder response = new StringBuilder("Seus versículos: \n");
             for (Versiculo v : versiculos) {
-                response.append(String.format("Livro: %s, Capítulo: %d, Versículo: %d - %s\n", v.getLivro(), v.getCapitulo(), v.getNumero(), v.getTexto()));
+                response.append(String.format("\n%s  %d:%d - %s\n", v.getLivro(), v.getCapitulo(), v.getNumero(), v.getTexto()));
             }
             bot.execute(new SendMessage(chatId, response.toString()));
         } else {
@@ -262,8 +257,6 @@ public class VerseBotService {
     }
 
 
-
-
     private void startCadastro(String chatId) {
         bot.execute(new SendMessage(chatId, "Digite seu nome completo:"));
         userStates.put(chatId, "awaiting_name");
@@ -271,27 +264,48 @@ public class VerseBotService {
 
     private void handleCadastro(String chatId, String userText) throws SQLException {
         String state = userStates.get(chatId);
+        Usuario usuario = tempUsers.getOrDefault(chatId, new Usuario());
+
         switch (state) {
             case "awaiting_name":
-                tempUsers.put(chatId, new Usuario());
-                tempUsers.get(chatId).setNome(userText);
+                if (!Validacoes.validarUsuario(userText)) {
+                    bot.execute(new SendMessage(chatId, "Erro: O nome deve ter entre 2 e 30 caracteres e conter apenas letras."));
+                    return;  // Sai do método se a validação falhar
+                }
+                if(!usuarioDao.isUsernameAvailable(userText)){
+                    bot.execute(new SendMessage(chatId, "Erro: Nome de usuário já está em uso. Por favor, escolha outro nome."));
+                    return;
+                }
+                usuario.setNome(userText);
+                tempUsers.put(chatId, usuario);
                 userStates.put(chatId, "awaiting_email");
                 bot.execute(new SendMessage(chatId, "Agora, digite seu email:"));
                 break;
             case "awaiting_email":
-                tempUsers.get(chatId).setEmail(userText);
+                if (!Validacoes.validarEmail(userText)) {
+                    bot.execute(new SendMessage(chatId, "Erro: Email inválido. Por favor, insira um email válido."));
+                    return;  // Sai do método se a validação falhar
+                }
+                usuario.setEmail(userText);
+                tempUsers.put(chatId, usuario);
                 userStates.put(chatId, "awaiting_password");
                 bot.execute(new SendMessage(chatId, "Por fim, digite sua senha:"));
                 break;
             case "awaiting_password":
-                tempUsers.get(chatId).setSenha(userText);
-                usuarioBO.registrarUsuario(tempUsers.get(chatId));
-                userStates.remove(chatId);
+                if (!Validacoes.validarSenha(userText)) {
+                    bot.execute(new SendMessage(chatId, "Erro: A senha deve conter no mínimo 6 caracteres, incluindo pelo menos um número, uma letra maiúscula, uma letra minúscula e um caractere especial."));
+                    return;
+                }
+                usuario.setSenha(userText);
+                // Supondo que a senha não precise de validação específica
+                usuarioBO.registrarUsuario(usuario);
                 tempUsers.remove(chatId);
+                userStates.remove(chatId);
                 bot.execute(new SendMessage(chatId, "Cadastro concluído com sucesso!"));
                 break;
         }
     }
+
 
 
 
