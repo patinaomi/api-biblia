@@ -36,26 +36,6 @@ public class UsuarioDaoImpl implements UsuarioDao {
         }
     }
 
-    @Override
-    public boolean validarId(int id) {
-        String sql = "SELECT COUNT(1) FROM Tb_Usuario WHERE id_user = ?";
-        try (Connection conn = ConexaoBancoDeDados.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    boolean exists = rs.getInt(1) > 0;
-                    System.out.println("Validar ID: " + id + " - Exists: " + exists); // Log para verificar o resultado da validação
-                    return exists;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao verificar ID do usuário");
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public int getUserIdByName(String name) {
         String sql = "SELECT id_user FROM Tb_Usuario WHERE nome = ?";
         try (Connection conn = ConexaoBancoDeDados.getConnection();
