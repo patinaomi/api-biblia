@@ -15,12 +15,8 @@ public class VersiculoDaoImpl implements VersiculoDao {
 
     @Override
     public void inserir(Versiculo versiculo) {
-        if (!validarUsuario(versiculo.getIdUsuario())) {
-            System.err.println("Erro: Usuário não encontrado.");
-            return;
-        }
-
         String sql = "INSERT INTO Tb_Versiculo (livro, capitulo, numero, texto, data_registro, id_usuario) VALUES (?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = ConexaoBancoDeDados.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -29,7 +25,7 @@ public class VersiculoDaoImpl implements VersiculoDao {
             ps.setInt(3, versiculo.getNumero());
             ps.setString(4, versiculo.getTexto());
             ps.setTimestamp(5, versiculo.getDataRegistro());
-            ps.setInt(6, versiculo.getIdUsuario());
+            ps.setInt(6, versiculo.getIdUsuario()); // Garantir que este é o ID correto
 
             int dadosAlterados = ps.executeUpdate();
             if (dadosAlterados > 0) {
@@ -43,18 +39,24 @@ public class VersiculoDaoImpl implements VersiculoDao {
         }
     }
 
+
     public boolean validarUsuario(int userId) {
-        String sql = "SELECT 1 FROM Tb_Usuario WHERE id_user = ?";
+        String sql = "SELECT COUNT(1) FROM Tb_Usuario WHERE id_user = ?";
         try (Connection conn = ConexaoBancoDeDados.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
-            return ps.executeQuery().next();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Retorna true se o usuário existe
+                }
+            }
         } catch (SQLException e) {
-            System.err.println("Erro ao verificar usuário.");
+            System.err.println("Erro ao verificar existência do usuário.");
             e.printStackTrace();
         }
-        return false;
+        return false; // Retorna false se o usuário não existir ou ocorrer um erro
     }
+
 
     @Override
     public List<Versiculo> listarVersiculosPorUser(String usuario) {
@@ -88,4 +90,7 @@ public class VersiculoDaoImpl implements VersiculoDao {
         }
         return versiculos;
     }
+
+
+
 }

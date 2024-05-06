@@ -28,4 +28,28 @@ public class TextToSpeechService {
         return inputStream; // Retorna o InputStream diretamente
     }
 
+    public File synthesizeToFile(String text) {
+        try {
+            SynthesizeOptions synthesizeOptions = new SynthesizeOptions.Builder()
+                    .text(text)
+                    .voice("pt-BR_IsabelaV3Voice")
+                    .accept("audio/mp3")
+                    .build();
+
+            InputStream inputStream = textToSpeech.synthesize(synthesizeOptions).execute().getResult();
+            File tempFile = File.createTempFile("tts", ".mp3");
+            try (FileOutputStream out = new FileOutputStream(tempFile)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) > 0) {
+                    out.write(buffer, 0, bytesRead);
+                }
+                return tempFile;
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to create audio file: " + e.getMessage());
+            return null;
+        }
+    }
+
 }

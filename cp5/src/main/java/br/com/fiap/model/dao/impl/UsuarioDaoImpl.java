@@ -36,25 +36,20 @@ public class UsuarioDaoImpl implements UsuarioDao {
         }
     }
 
-    public int getUserIdByName(String name) {
+    public int getUserIdByName(String userName) {
         String sql = "SELECT id_user FROM Tb_Usuario WHERE nome = ?";
         try (Connection conn = ConexaoBancoDeDados.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, name);
+            ps.setString(1, userName);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("id_user");
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao verificar nome do usuário");
+            System.err.println("Erro ao buscar ID do usuário.");
             e.printStackTrace();
         }
-        return -1; // ID inválido
+        return -1;  // Retorna -1 se o usuário não for encontrado
     }
-
-
-
-
-
 
 }

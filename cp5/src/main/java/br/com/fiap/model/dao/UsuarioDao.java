@@ -6,6 +6,5 @@ import br.com.fiap.model.vo.Usuario;
 public interface UsuarioDao {
     void inserir(Usuario usuario);
     int getUserIdByName(String name);
-
 }
 

@@ -73,10 +73,6 @@ public class BibleService {
         }
     }
 
-    public void salvarVersiculo(Versiculo versiculo) throws SQLException {
-            versiculoDao.inserir(versiculo);
-    }
-
     public Versiculo getVersiculoAleatorioDeLivro(int userId, String abbrev) {
         Gson gson = new Gson();
         String jsonResponse = apiClient.getRandomVerseByAbbreviation(abbrev);

@@ -40,6 +40,7 @@ public class VerseBotService {
     private TextToSpeechService textToSpeechService = new TextToSpeechService();
     private Map<String, String> userStates = new HashMap<>();
     private Map<String, Versiculo> lastGeneratedVerses = new HashMap<>();
+    private Map<String, Usuario> tempUsers = new HashMap<>();
 
     public VerseBotService(String token, OpenAiService openAiService) {
         bot = new TelegramBot(token);
@@ -76,6 +77,9 @@ public class VerseBotService {
                 case "/start":
                     handleStart(chatId);
                     break;
+                case "/cadastro":
+                    startCadastro(chatId);
+                    break;
                 case "/devocional":
                     handleDevocional(chatId);
                     break;
@@ -83,64 +87,47 @@ public class VerseBotService {
                     handleVersiculo(chatId);
                     break;
                 case "/salvar":
-                    requestUserName(chatId);
+                    startSaveVersicle(chatId);
                     break;
                 case "/meusversiculos":
                     requestUserNameForListing(chatId);
                     break;
-                case "/speak":
-                    handleSpeak(chatId);
+                case "/oracao":
+                    handlePrayer(chatId);
                     break;
                 default:
-                    if ("awaiting_name".equals(userStates.get(chatId))) {
-                        handleListingVerses(chatId, userText);
-                    } else {
-                        handleDefault(chatId);
-                    }
+                    handleStateBasedActions(chatId, userText);
                     break;
             }
         }
     }
 
-    private void handleSpeak(String chatId) {
-        String textToSpeak = "Olá, isso é uma mensagem de teste";
-        try {
-            InputStream audioStream = textToSpeechService.synthesize(textToSpeak);
-            if (audioStream != null) {
-                // Convertendo InputStream para arquivo
-                File audioFile = streamToFile(audioStream, "text-to-speech.mp3");
-                if (audioFile != null) {
-                    // Usando o arquivo diretamente no SendAudio
-                    SendAudio sendAudio = new SendAudio(chatId, audioFile);
-                    bot.execute(sendAudio);
-                    // Deletar o arquivo após enviar
-                    audioFile.delete();
-                } else {
-                    bot.execute(new SendMessage(chatId, "Erro ao salvar o áudio em arquivo."));
-                }
-            } else {
-                bot.execute(new SendMessage(chatId, "Erro ao gerar áudio."));
-            }
-        } catch (IOException e) {
-            bot.execute(new SendMessage(chatId, "Erro ao processar o áudio."));
-        }
+
+
+    private void startSaveVersicle(String chatId) {
+        userStates.put(chatId, "awaiting_user_for_saving");
+        bot.execute(new SendMessage(chatId, "Por favor, digite seu nome para salvar o versículo."));
     }
 
-    /**
-     * Salva o InputStream em um arquivo temporário.
-     */
-    private File streamToFile(InputStream in, String fileName) throws IOException {
-        File tempFile = File.createTempFile("tts", ".mp3");
-        tempFile.deleteOnExit();
-        try (FileOutputStream out = new FileOutputStream(tempFile)) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
+
+
+    private void handleSaveVerse(String chatId, String userName) {
+        int userId = usuarioDao.getUserIdByName(userName);
+        if (userId != -1) {
+            Versiculo versiculoToSave = lastGeneratedVerses.get(chatId);
+            if (versiculoToSave != null) {
+                versiculoToSave.setIdUsuario(userId); // Atualiza o ID do usuário no versículo
+                versiculoDao.inserir(versiculoToSave);
+                bot.execute(new SendMessage(chatId, "Versículo salvo com sucesso."));
+            } else {
+                bot.execute(new SendMessage(chatId, "Nenhum versículo foi gerado anteriormente."));
             }
+        } else {
+            bot.execute(new SendMessage(chatId, "Nome de usuário não encontrado, tente novamente."));
         }
-        return tempFile;
+        userStates.remove(chatId); // Remover o estado independentemente do resultado
     }
+
 
 
 
@@ -167,21 +154,55 @@ public class VerseBotService {
         bot.execute(new SendMessage(chatId, versiculo.toString()));
     }
 
-    private void handleSaveVerse(String chatId, String userName) {
-        int userId = usuarioDao.getUserIdByName(userName);
-        if (userId != -1) {
-            Versiculo versiculoToSave = lastGeneratedVerses.get(chatId);
-            if (versiculoToSave != null) {
-                versiculoToSave.setIdUsuario(userId); // Atualiza o ID do usuário no versículo
-                versiculoDao.inserir(versiculoToSave);
-                bot.execute(new SendMessage(chatId, "Versículo salvo com sucesso."));
-            } else {
-                bot.execute(new SendMessage(chatId, "Nenhum versículo foi gerado anteriormente."));
+
+    private void handleStateBasedActions(String chatId, String userText) throws SQLException {
+        String state = userStates.get(chatId);
+        if (state != null) {
+            switch (state) {
+                case "awaiting_name":
+                case "awaiting_email":
+                case "awaiting_password":
+                    handleCadastro(chatId, userText);
+                    break;
+                case "awaiting_user_for_saving":
+                    handleSaveVerse(chatId, userText);
+                    break;
+                case "awaiting_user_name_for_listing":
+                    handleListingVerses(chatId, userText);
+                    break;
+                default:
+                    handleDefault(chatId);
+                    break;
             }
         } else {
-            bot.execute(new SendMessage(chatId, "Nome de usuário não encontrado, tente novamente."));
+            handleDefault(chatId);
         }
-        userStates.remove(chatId); // Remover o estado independentemente do resultado
+    }
+
+
+    private void handleResponsesBasedOnState(String chatId, String userText) throws SQLException {
+        String state = userStates.get(chatId);
+        if (state != null) {
+            switch (state) {
+                case "awaiting_name":
+                    handleCadastro(chatId, userText);
+                    break;
+                case "awaiting_email":
+                    handleCadastro(chatId, userText);
+                    break;
+                case "awaiting_password":
+                    handleCadastro(chatId, userText);
+                    break;
+                case "awaiting_user_for_saving":
+                    handleSaveVerse(chatId, userText);
+                    break;
+                default:
+                    handleDefault(chatId);
+                    break;
+            }
+        } else {
+            handleDefault(chatId);
+        }
     }
 
 
@@ -200,7 +221,7 @@ public class VerseBotService {
     }
 
     private void requestUserNameForListing(String chatId) {
-        userStates.put(chatId, "awaiting_name");
+        userStates.put(chatId, "awaiting_user_name_for_listing");
         bot.execute(new SendMessage(chatId, "Digite seu nome para listar seus versículos cadastrados:"));
     }
 
@@ -217,6 +238,63 @@ public class VerseBotService {
         }
         userStates.remove(chatId); // Remover o estado após a execução
     }
+
+
+
+
+
+    private void handlePrayer(String chatId) {
+        String oracao = "Por favor, gera uma oração para hoje.";
+        String textToPray = openAiService.gerarDevocional(oracao);
+        File audioFile = textToSpeechService.synthesizeToFile(textToPray);
+
+        if (audioFile != null) {
+            try {
+                SendAudio sendAudio = new SendAudio(chatId, audioFile);
+                bot.execute(sendAudio);
+                audioFile.delete(); // Remove o arquivo temporário após o envio
+            } catch (Exception e) {
+                bot.execute(new SendMessage(chatId, "Erro ao enviar áudio: " + e.getMessage()));
+            }
+        } else {
+            bot.execute(new SendMessage(chatId, "Erro ao gerar áudio da oração."));
+        }
+    }
+
+
+
+
+    private void startCadastro(String chatId) {
+        bot.execute(new SendMessage(chatId, "Digite seu nome completo:"));
+        userStates.put(chatId, "awaiting_name");
+    }
+
+    private void handleCadastro(String chatId, String userText) throws SQLException {
+        String state = userStates.get(chatId);
+        switch (state) {
+            case "awaiting_name":
+                tempUsers.put(chatId, new Usuario());
+                tempUsers.get(chatId).setNome(userText);
+                userStates.put(chatId, "awaiting_email");
+                bot.execute(new SendMessage(chatId, "Agora, digite seu email:"));
+                break;
+            case "awaiting_email":
+                tempUsers.get(chatId).setEmail(userText);
+                userStates.put(chatId, "awaiting_password");
+                bot.execute(new SendMessage(chatId, "Por fim, digite sua senha:"));
+                break;
+            case "awaiting_password":
+                tempUsers.get(chatId).setSenha(userText);
+                usuarioBO.registrarUsuario(tempUsers.get(chatId));
+                userStates.remove(chatId);
+                tempUsers.remove(chatId);
+                bot.execute(new SendMessage(chatId, "Cadastro concluído com sucesso!"));
+                break;
+        }
+    }
+
+
+
 
 
 
