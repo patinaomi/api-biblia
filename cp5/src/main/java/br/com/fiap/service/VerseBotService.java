@@ -32,17 +32,16 @@ public class VerseBotService {
     private TelegramBot bot;
     private OpenAiService openAiService;
     private TextToSpeechService textToSpeechService;
-    private Map<String, String> userStates;
-    private Map<String, Versiculo> ultimoVersiculoGerado;
-    private Map<String, Usuario> tempUsers;
-
     private BibleApiClient apiClient;
     private VersiculoDao versiculoDao;
     private UsuarioDao usuarioDao;
     private BibleService bibleService;
     private UsuarioBO usuarioBO;
     private VersiculoBO versiculoBO;
+    private Map<String, Versiculo> ultimoVersiculoGerado  = new HashMap<>();;
+    private Map<String, Usuario> tempUsers  = new HashMap<>();;
     private Map<String, String> books;
+    private Map<String, String> userStates = new HashMap<>();
 
 
     /**
