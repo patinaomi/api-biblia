@@ -40,40 +40,11 @@
             <version>23.3.0.23.09</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.35</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>2.35</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>2.35</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-jetty-http -->
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-jetty-http</artifactId>
-            <version>3.1.6</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <version>10.1.19</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ibm.watson</groupId>
-            <artifactId>ibm-watson</artifactId>
-            <version>12.0.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.ibm.watson/text-to-speech -->
@@ -82,10 +53,6 @@
             <artifactId>text-to-speech</artifactId>
             <version>12.0.1</version>
         </dependency>
-
-
-
-
 
     </dependencies>
 
