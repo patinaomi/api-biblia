@@ -5,6 +5,7 @@
 
 - [Descrição do Projeto](#descrição-do-projeto)
 - [Funcionalidades](#funcionalidades)
+- [Acesso ao Bot](#acesso-ao-bot)
 - [Visão Geral](#visão-geral)
   - [Camadas](#camadas)
 - [Integração com APIs Externas](#integração-com-apis-externas)
@@ -31,6 +32,12 @@ VerseBot é uma aplicação Java desenvolvida para interagir com usuários atrav
 - **Salvamento de Versículos**: Usuários podem salvar versículos de interesse, que são armazenados no banco de dados.
 - **Geração de Devocionais**: Utiliza a API do OpenAI para gerar devocionais baseados em versículos específicos.
 - **Síntese de Voz**: Converte textos em áudio usando o serviço IBM Text to Speech.
+
+## Acesso ao Bot
+
+O VerseBot está disponível no Telegram e pode ser acessado diretamente através do seguinte link: [VerseBot no Telegram](https://t.me/versiculo_do_dia_bot).
+Clique no link para iniciar uma conversa com o bot e explorar suas funcionalidades interativas, como geração de versículos, cadastro de usuários, e mais.
+
 
 ## Visão Geral
 
