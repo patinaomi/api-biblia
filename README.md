@@ -89,6 +89,7 @@ O arquivo deve conter as chaves e valores para configurações como:
 ```properties
 db.username=SEU_USUARIO
 db.password=SUA_SENHA
+db.url=SEU_URL
 telegram.api.key=CHAVE_API_TELEGRAM
 openai.api.key=CHAVE_API_OPENAI
 tts.api.key=CHAVE_API_IBM_TTS
