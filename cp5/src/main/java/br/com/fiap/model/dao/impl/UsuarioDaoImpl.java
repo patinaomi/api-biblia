@@ -54,7 +54,8 @@ public class UsuarioDaoImpl implements UsuarioDao {
         return -1;  // Retorna -1 se o usuário não for encontrado (-1 porque não vai ter um usuário com id "negativo")
     }
 
-    public boolean isUsernameAvailable(String username) {
+    //esse método vai ver se só tem um usuario com esse nome
+    public boolean isUserDisponivel(String username) {
         String sql = "SELECT COUNT(*) FROM Tb_Usuario WHERE nome = ?";
         try (Connection conn = ConexaoBancoDeDados.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

@@ -55,6 +55,7 @@ public class BibleApiClient {
         }
     }
 
+    //Método pra gerar um versículo aleatório de um livro específico da Bíblia
     public String getRandomVerseByAbbreviation(String abbrev) {
         String url = "https://www.abibliadigital.com.br/api/verses/nvi/" + abbrev + "/random";
         HttpRequest request = HttpRequest.newBuilder()
@@ -70,4 +71,3 @@ public class BibleApiClient {
         }
     }
 }
-

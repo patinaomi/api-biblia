@@ -6,6 +6,7 @@ import br.com.fiap.model.vo.Versiculo;
 import java.sql.SQLException;
 import java.util.List;
 
+//Classe Controller, será implementada futuramente quando esse projeto for integrado com o front end
 public class VersiculoController {
     private VersiculoDao versiculoDao;
 

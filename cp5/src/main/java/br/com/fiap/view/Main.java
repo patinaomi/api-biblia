@@ -3,7 +3,6 @@ package br.com.fiap.view;
 import br.com.fiap.model.conexoes.ConexaoBancoDeDados;
 import br.com.fiap.service.OpenAiService;
 import br.com.fiap.service.VerseBotService;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Main {
