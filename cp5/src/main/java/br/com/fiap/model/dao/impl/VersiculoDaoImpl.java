@@ -1,6 +1,6 @@
 package br.com.fiap.model.dao.impl;
 
-import br.com.fiap.model.conexoes.ConexaoBancoDeDados;
+import br.com.fiap.model.conexoes.ConexaoFactory;
 import br.com.fiap.model.dao.VersiculoDao;
 import br.com.fiap.model.vo.Versiculo;
 
@@ -17,7 +17,7 @@ public class VersiculoDaoImpl implements VersiculoDao {
     public void insert(Versiculo versiculo) {
         String sql = "INSERT INTO Tb_Versiculo (livro, capitulo, numero, texto, data_registro, id_usuario) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = ConexaoBancoDeDados.getConnection();
+        try (Connection conn = ConexaoFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, versiculo.getLivro());
@@ -49,8 +49,8 @@ public class VersiculoDaoImpl implements VersiculoDao {
         WHERE u.nome = ?
         """;
 
-        try (Connection conn = ConexaoBancoDeDados.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexaoFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, usuario);
             ResultSet rs = ps.executeQuery();

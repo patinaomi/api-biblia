@@ -2,6 +2,10 @@ package br.com.fiap.model.vo;
 
 import java.sql.Timestamp;
 
+/**
+ * Representa um versículo bíblico, contendo informações sobre a localização do texto na Bíblia
+ * e o texto em si, além de metadados para associação com um usuário e registro no sistema.
+ */
 public class Versiculo {
     //Atributos
     private Integer idVers;
@@ -14,16 +18,6 @@ public class Versiculo {
 
     // Construtores
     public Versiculo() {
-    }
-
-    public Versiculo(Integer idVers, String livro, Integer capitulo, Integer numero, String texto, Timestamp dataRegistro, Integer idUsuario) {
-        this.idVers = idVers;
-        this.livro = livro;
-        this.capitulo = capitulo;
-        this.numero = numero;
-        this.texto = texto;
-        this.dataRegistro = dataRegistro;
-        this.idUsuario = idUsuario;
     }
 
     // Getters e setters

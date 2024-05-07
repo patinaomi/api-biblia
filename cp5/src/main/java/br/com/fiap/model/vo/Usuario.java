@@ -1,5 +1,8 @@
 package br.com.fiap.model.vo;
 
+/**
+ * Representa um usuário do sistema, contendo informações pessoais e de autenticação.
+ */
 public class Usuario {
     //Atributos
     private Integer idUser;

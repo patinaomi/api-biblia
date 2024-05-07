@@ -1,6 +1,6 @@
 package br.com.fiap.model.dao.impl;
 
-import br.com.fiap.model.conexoes.ConexaoBancoDeDados;
+import br.com.fiap.model.conexoes.ConexaoFactory;
 import br.com.fiap.model.dao.UsuarioDao;
 import br.com.fiap.model.vo.Usuario;
 
@@ -14,7 +14,7 @@ public class UsuarioDaoImpl implements UsuarioDao {
     public void insert(Usuario usuario) {
         String sql = "INSERT INTO Tb_Usuario (nome, email, senha, notificacoes, external_id) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = ConexaoBancoDeDados.getConnection();
+        try (Connection conn = ConexaoFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNome());
@@ -40,7 +40,7 @@ public class UsuarioDaoImpl implements UsuarioDao {
     //Vai pegar o id do usuário pelo nome
     public int getUserIdByName(String userName) {
         String sql = "SELECT id_user FROM Tb_Usuario WHERE nome = ?";
-        try (Connection conn = ConexaoBancoDeDados.getConnection();
+        try (Connection conn = ConexaoFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, userName);
             ResultSet rs = ps.executeQuery();
@@ -57,7 +57,7 @@ public class UsuarioDaoImpl implements UsuarioDao {
     //esse método vai ver se só tem um usuario com esse nome
     public boolean isUserDisponivel(String username) {
         String sql = "SELECT COUNT(*) FROM Tb_Usuario WHERE nome = ?";
-        try (Connection conn = ConexaoBancoDeDados.getConnection();
+        try (Connection conn = ConexaoFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
