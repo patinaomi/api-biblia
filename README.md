@@ -1,4 +1,24 @@
 # Documento de Projeto: VerseBot
+<p align="center"><img src="http://img.shields.io/static/v1?label=STATUS&message=CONCLUIDO&color=GREEN&style=for-the-badge"/></p>
+
+## Índice
+
+- [Descrição do Projeto](#descrição-do-projeto)
+- [Funcionalidades](#funcionalidades)
+- [Visão Geral](#visão-geral)
+  - [Camadas](#camadas)
+- [Integração com APIs Externas](#integração-com-apis-externas)
+  - [API da Bíblia Digital](#api-da-bíblia-digital)
+  - [OpenAI](#openai)
+  - [IBM Watson Text to Speech](#ibm-watson-text-to-speech)
+  - [API do Telegram](#api-do-telegram)
+- [Configuração e Uso](#configuração-e-uso)
+  - [Uso de Arquivo config.properties](#uso-de-arquivo-configproperties)
+- [Referências e Documentações Consultadas](#referências-e-documentações-consultadas)
+- [Aprendizados com o Projeto](#aprendizados-com-o-projeto)
+- [Contribuições](#contribuições)
+
+
 
 ## Descrição do Projeto
 
@@ -79,3 +99,17 @@ Durante o desenvolvimento do projeto, várias APIs e bibliotecas foram utilizada
 - **IBM Watson Text to Speech** - SDK de Java para o serviço Text to Speech da IBM Watson. [GitHub Repository](https://github.com/watson-developer-cloud/java-sdk/tree/master/text-to-speech)
 
 Estas documentações foram fundamentais para o desenvolvimento das funcionalidades do projeto, permitindo a integração eficiente com os serviços externos utilizados.
+
+## Aprendizados com o Projeto
+
+Durante o desenvolvimento do VerseBot, tive a oportunidade de aprender e aplicar vários conceitos importantes:
+
+- **Uso de HashMaps**: Aprendi como utilizar HashMaps para gerenciar estados de usuários de forma eficiente, o que foi crucial para manter o contexto das conversas no bot.
+- **Consumo de APIs**: Melhorei minha habilidade de consumir APIs externas, integrando serviços como a Bíblia Digital, OpenAI e IBM Watson para enriquecer as funcionalidades do bot.
+- **Criação e Uso da Classe Config**: Utilizei uma classe de configuração para gerenciar variáveis de ambiente e configurações sensíveis, facilitando a manutenção e a escalabilidade do projeto.
+
+Esses aprendizados não apenas contribuíram para o sucesso deste projeto, mas também aprimoraram minhas habilidades como desenvolvedor.
+
+## Contribuições
+
+Este projeto está aberto para contribuições! Se você tem ideias para melhorá-lo ou encontrou algum bug, fique à vontade para criar um fork e submeter suas alterações via pull request. Toda contribuição é bem-vinda e ajuda a fazer deste projeto um recurso ainda melhor para a comunidade.
