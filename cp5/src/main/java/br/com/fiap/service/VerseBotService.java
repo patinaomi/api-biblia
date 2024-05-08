@@ -55,7 +55,7 @@ public class VerseBotService {
         this.openAiService = openAiService;
         this.apiClient = new BibleApiClient();
         this.versiculoDao = new VersiculoDaoImpl();
-         this.textToSpeechService = new TextToSpeechService();
+        this.textToSpeechService = new TextToSpeechService();
         this.usuarioDao = new UsuarioDaoImpl();
         this.bibleService = new BibleService(apiClient, usuarioDao, versiculoDao);
         this.usuarioBO = new UsuarioBO(usuarioDao, apiClient);
